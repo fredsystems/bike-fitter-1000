@@ -1,0 +1,15 @@
+# Build artifacts
+/target/
+**/*.rs.bk
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+
+# Nix stuff
+.direnv/
+.pre-commit-config.yaml
+
+# OS
+.DS_Store
