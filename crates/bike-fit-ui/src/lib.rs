@@ -21,9 +21,15 @@ pub use render::{
 
 /// Pluggable storage backend.
 ///
-/// Native uses a JSON file on disk; web will use `localStorage`. Both go
+/// Native uses a JSON file on disk; web uses `localStorage`. Both go
 /// through this trait so the rest of the UI doesn't care.
-pub trait Persistence: Send + Sync + 'static {
+///
+/// The trait is intentionally not `Send + Sync`: the wasm `localStorage`
+/// implementation uses `RefCell` (single-threaded by construction) and
+/// the native impl already serializes through a `Mutex` internally. The
+/// app holds the persistence as an `Rc<dyn Persistence>` since eframe's
+/// per-frame update loop is single-threaded on both targets.
+pub trait Persistence: 'static {
     /// Load the persisted state, if any.
     fn load(&self) -> Option<AppState>;
     /// Persist the state. Errors are logged and otherwise swallowed; this

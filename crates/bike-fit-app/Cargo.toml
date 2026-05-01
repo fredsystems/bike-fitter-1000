@@ -11,7 +11,14 @@ path = "src/main.rs"
 [dependencies]
 bike-fit-core = { path = "../bike-fit-core" }
 bike-fit-ui = { path = "../bike-fit-ui" }
-eframe.workspace = true
+# Native binary opts in to the desktop eframe features. The workspace
+# declaration is feature-less so the wasm crate can pick its own set.
+eframe = { workspace = true, features = [
+  "default_fonts",
+  "wayland",
+  "wgpu",
+  "x11",
+] }
 egui.workspace = true
 log.workspace = true
 env_logger.workspace = true

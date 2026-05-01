@@ -2,6 +2,10 @@
 /target/
 **/*.rs.bk
 
+# Trunk wasm build output
+**/dist/
+.trunk/
+
 # Editor / IDE
 .vscode/
 .idea/

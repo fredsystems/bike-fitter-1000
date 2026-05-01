@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#1f2329" />
+    <title>bike-fitter-1000</title>
+    <!--
+      Trunk emits the wasm-bindgen JS shim and wasm binary. data-type="main"
+      means the shim's default export auto-runs as the module entrypoint.
+      data-wasm-opt="z" runs binaryen wasm-opt -Oz on release builds for
+      smallest payload. We pin data-bin so trunk picks the right cdylib.
+    -->
+    <link
+      data-trunk
+      rel="rust"
+      data-wasm-opt="z"
+      data-initializer="bootstrap.js"
+    />
+    <link data-trunk rel="copy-file" href="bootstrap.js" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background: #1f2329;
+        overflow: hidden;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #e7e9ec;
+      }
+      #bike-fitter-canvas {
+        display: block;
+        width: 100vw;
+        height: 100vh;
+      }
+      #loading {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: #8a93a3;
+        pointer-events: none;
+      }
+      #loading.hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="bike-fitter-canvas"></canvas>
+    <div id="loading">Loading bike-fitter-1000…</div>
+  </body>
+</html>

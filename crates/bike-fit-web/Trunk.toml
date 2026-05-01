@@ -1,0 +1,20 @@
+# trunk build configuration for bike-fitter-1000
+#
+# Run `trunk serve` from this directory for live-reload dev. `trunk build
+# --release` produces the static bundle in `dist/` ready to upload to any
+# static host.
+
+[build]
+# Output dir relative to this Trunk.toml.
+target = "index.html"
+dist = "dist"
+# Public-url is the path the site is served from. "/" works for any
+# host-root deploy (Netlify, Cloudflare Pages, GH Pages user/org sites).
+# For a GH Pages project page, override with `--public-url=/repo-name/`.
+public_url = "/"
+
+[serve]
+addresses = ["127.0.0.1"]
+port = 8080
+# Serve over HTTP; eframe's wgpu backend is fine over HTTP for localhost.
+open = false
