@@ -13,9 +13,15 @@ crate-type = ["cdylib", "rlib"]
 bike-fit-core = { path = "../bike-fit-core" }
 bike-fit-ui = { path = "../bike-fit-ui" }
 # Browser eframe: default_fonts (so we don't have to ship a TTF) plus the
-# wgpu backend, which targets WebGL2/WebGPU at the browser layer. wayland/x11
-# are deliberately omitted — they break the wasm32 build.
-eframe = { workspace = true, features = ["default_fonts", "wgpu"] }
+# glow (WebGL2) backend. We deliberately skip the wgpu backend here:
+#   - wgpu on web tries WebGPU first, then falls back to WebGL2 via wgpu's
+#     own adapter logic, which silently fails on browsers/GPUs where
+#     WebGPU isn't enabled and the WebGL2 path's adapter isn't picked up
+#     ("no suitable adapter found").
+#   - glow targets WebGL2 directly, which is universally supported, has
+#     no adapter selection, and produces a noticeably smaller wasm.
+# This app is 2D line art — wgpu's compute/3D capabilities buy us nothing.
+eframe = { workspace = true, features = ["default_fonts", "glow"] }
 egui.workspace = true
 log.workspace = true
 serde.workspace = true
