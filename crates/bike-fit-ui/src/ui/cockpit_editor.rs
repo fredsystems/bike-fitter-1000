@@ -204,7 +204,7 @@ fn switch_kind(prev: &Cockpit, target: &str) -> Cockpit {
             // Aero stems come at fixed angles; we model that with a catalog
             // restricted to 0° SKUs by default. The user can customize.
             stems: StemCatalog {
-                stems: [80.0, 90.0, 100.0, 110.0, 120.0, 130.0]
+                stems: [70.0, 80.0, 90.0, 100.0, 110.0, 120.0, 130.0]
                     .into_iter()
                     .map(|l| bike_fit_core::Stem {
                         length_mm: l,
