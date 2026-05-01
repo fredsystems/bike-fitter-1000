@@ -1,0 +1,71 @@
+{
+  "_comment": "Bundled bike frame database for bike-fitter-1000. Compiled into the binary via include_str!. Edit by hand; geometry is taken from manufacturer-published numbers (geometrygeeks.bike / bike-insights / OEM sites). The 'key' is a stable identifier — never rename it once shipped, or persisted user state will lose its selection. wheel_size is one of \"Iso622\" (700C/29\"), \"Iso584\" (650B/27.5\"), or {\"Custom\": <bsd_mm>}.",
+  "frames": [
+    {
+      "key": "canyon-aeroad-cf-slx-7-2xs-2025",
+      "frame": {
+        "manufacturer": "Canyon",
+        "model": "Aeroad CF SLX 7",
+        "size_label": "2XS",
+        "year": 2025,
+        "stack_mm": 498.0,
+        "reach_mm": 372.0,
+        "head_tube_angle_deg": 70.0,
+        "head_tube_length_mm": 88.0,
+        "seat_tube_angle_deg": 73.5,
+        "seat_tube_length_mm": 441.0,
+        "top_tube_effective_mm": 516.0,
+        "bb_drop_mm": 70.0,
+        "chainstay_mm": 410.0,
+        "fork_rake_mm": 40.6,
+        "front_center_horizontal_mm": 571.0,
+        "wheel_size": "Iso622",
+        "tire_width_mm": 28.0
+      }
+    },
+    {
+      "key": "canyon-endurace-cf-slx-3xs-2025",
+      "frame": {
+        "manufacturer": "Canyon",
+        "model": "Endurace CF SLX",
+        "size_label": "3XS",
+        "year": 2025,
+        "stack_mm": 510.0,
+        "reach_mm": 350.0,
+        "head_tube_angle_deg": 70.3,
+        "head_tube_length_mm": 123.0,
+        "seat_tube_angle_deg": 73.5,
+        "seat_tube_length_mm": 402.0,
+        "top_tube_effective_mm": 501.0,
+        "bb_drop_mm": 60.0,
+        "chainstay_mm": 405.0,
+        "fork_rake_mm": 44.6,
+        "front_center_horizontal_mm": 558.5,
+        "wheel_size": "Iso584",
+        "tire_width_mm": 32.0
+      }
+    },
+    {
+      "key": "specialized-tarmac-sl8-44-2025",
+      "frame": {
+        "manufacturer": "Specialized",
+        "model": "Tarmac SL8",
+        "size_label": "44",
+        "year": 2025,
+        "stack_mm": 501.0,
+        "reach_mm": 366.0,
+        "head_tube_angle_deg": 70.5,
+        "head_tube_length_mm": 99.0,
+        "seat_tube_angle_deg": 75.5,
+        "seat_tube_length_mm": 433.0,
+        "top_tube_effective_mm": 496.0,
+        "bb_drop_mm": 74.0,
+        "chainstay_mm": 410.0,
+        "fork_rake_mm": 46.7,
+        "front_center_horizontal_mm": 566.7,
+        "wheel_size": "Iso622",
+        "tire_width_mm": 26.0
+      }
+    }
+  ]
+}
