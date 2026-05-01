@@ -15,7 +15,9 @@ use bike_fit_core::{Cockpit, FitProfile, Frame, Point};
 use eframe::egui;
 
 pub use frames::Preset;
-pub use render::{paint_frame, paint_frame_with_overlay, show_frame, RenderStyle};
+pub use render::{
+    paint_achieved_overlay, paint_frame, paint_frame_with_overlay, show_frame, RenderStyle,
+};
 
 /// Pluggable storage backend.
 ///
@@ -194,6 +196,35 @@ impl eframe::App for App {
                 });
             });
 
+        egui::SidePanel::right("cockpit-and-solver")
+            .resizable(true)
+            .default_width(300.0)
+            .min_width(260.0)
+            .show(ctx, |ui| {
+                egui::ScrollArea::vertical().show(ui, |ui| {
+                    ui.add_space(4.0);
+                    ui.heading("Cockpit");
+                    ui.add_space(4.0);
+
+                    if ui::cockpit_editor::show(ui, &mut self.state.cockpit) {
+                        state_dirty = true;
+                    }
+
+                    ui.add_space(12.0);
+                    ui.separator();
+                    ui.add_space(4.0);
+                    ui.heading("Solver");
+                    ui.add_space(4.0);
+
+                    ui::solver_panel::show(
+                        ui,
+                        &self.state.frame,
+                        &self.state.fit,
+                        &self.state.cockpit,
+                    );
+                });
+            });
+
         egui::CentralPanel::default()
             .frame(egui::Frame::none().fill(style.background))
             .show(ctx, |ui| {
@@ -207,6 +238,20 @@ impl eframe::App for App {
                     Some(self.state.fit.bar_target),
                     &style,
                 );
+                if let Ok(build) = bike_fit_core::solver::solve_for_profile(
+                    &self.state.frame,
+                    &self.state.fit,
+                    &self.state.cockpit,
+                ) {
+                    render::paint_achieved_overlay(
+                        &painter,
+                        painter_rect,
+                        &self.state.frame,
+                        Some(self.state.fit.bar_target),
+                        build.achieved_bar_position,
+                        &style,
+                    );
+                }
             });
 
         if state_dirty {

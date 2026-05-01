@@ -30,6 +30,8 @@ pub struct RenderStyle {
     pub saddle_accent: Color32,
     /// Color of the bar target dot.
     pub bar_accent: Color32,
+    /// Color of the achieved-bar-position ring (solver output overlay).
+    pub achieved_accent: Color32,
 }
 
 impl Default for RenderStyle {
@@ -46,6 +48,9 @@ impl Default for RenderStyle {
             // against the muted-blue palette and visually distinct.
             saddle_accent: Color32::from_rgb(255, 210, 80),
             bar_accent: Color32::from_rgb(240, 110, 90),
+            // Cool cyan/green for the solver result so it reads as
+            // "computed" against the warm target dots.
+            achieved_accent: Color32::from_rgb(110, 220, 200),
         }
     }
 }
@@ -119,6 +124,32 @@ pub fn paint_frame_with_overlay(
     if let Some(p) = bar_target {
         paint_target_dot(painter, xform.world_to_screen(p), style.bar_accent, style);
     }
+}
+
+/// Paint an "achieved" bar position dot drawn as an open ring (so it doesn't
+/// occlude the underlying bar-target dot when the two are close), plus a
+/// dashed-ish line connecting target → achieved when both are supplied.
+pub fn paint_achieved_overlay(
+    painter: &egui::Painter,
+    rect: Rect,
+    frame: &Frame,
+    bar_target: Option<Point>,
+    achieved: Point,
+    style: &RenderStyle,
+) {
+    let world_bounds = bike_world_bounds(frame);
+    let xform = Transform::fit(world_bounds, rect, style.padding_px);
+    let achieved_screen = xform.world_to_screen(achieved);
+    if let Some(t) = bar_target {
+        let target_screen = xform.world_to_screen(t);
+        // Connector line — same color as achieved ring, semi-transparent.
+        let mut col = style.achieved_accent;
+        col = Color32::from_rgba_unmultiplied(col.r(), col.g(), col.b(), 180);
+        painter.line_segment([target_screen, achieved_screen], Stroke::new(1.5, col));
+    }
+    let r = 6.0;
+    painter.circle_stroke(achieved_screen, r, Stroke::new(2.0, style.achieved_accent));
+    painter.circle_stroke(achieved_screen, r, Stroke::new(0.5, style.stroke));
 }
 
 /// Filled disc with a thin white ring around it, so target dots read on any
