@@ -5,7 +5,13 @@
 use eframe::egui;
 
 fn main() -> eframe::Result<()> {
-    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
+    // Default filter: our crates at info, the graphics stack at warn (wgpu's
+    // per-frame `Device::maintain: waiting for submission index N` log at
+    // info level is too chatty for an interactive app). `RUST_LOG` overrides.
+    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or(
+        "info,wgpu=warn,wgpu_core=warn,wgpu_hal=warn,naga=warn,eframe=warn,egui_wgpu=warn",
+    ))
+    .init();
 
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
@@ -18,11 +24,10 @@ fn main() -> eframe::Result<()> {
     eframe::run_native(
         "bike-fitter-1000",
         native_options,
-        Box::new(|_cc| Ok(Box::new(App::default()))),
+        Box::new(|_cc| Ok(Box::new(App))),
     )
 }
 
-#[derive(Default)]
 struct App;
 
 impl eframe::App for App {
