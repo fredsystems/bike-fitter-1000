@@ -7,6 +7,7 @@
 
 pub mod frames;
 pub mod render;
+pub mod ui;
 
 use std::sync::Arc;
 
@@ -87,6 +88,24 @@ impl App {
         }
     }
 
+    /// Re-apply the active preset to the live frame, discarding any local
+    /// edits. No-op if the active key isn't in the preset list (e.g. for a
+    /// frame the user fully authored).
+    fn reset_frame_to_preset(&mut self) -> bool {
+        if let Some(p) = frames::by_key(&self.state.active_frame_key) {
+            if self.state.frame != p.frame {
+                self.state.frame = p.frame;
+                return true;
+            }
+        }
+        false
+    }
+
+    /// Has the live frame diverged from its preset?
+    fn frame_diverged_from_preset(&self) -> bool {
+        frames::by_key(&self.state.active_frame_key).is_some_and(|p| p.frame != self.state.frame)
+    }
+
     /// Render style for the currently-active frame: default style tinted by
     /// the active key so each preset has a visibly distinct background.
     fn current_style(&self) -> RenderStyle {
@@ -128,17 +147,41 @@ impl eframe::App for App {
                         state_dirty = true;
                     }
                 }
-
-                ui.separator();
-                let f = &self.state.frame;
-                ui.label(format!(
-                    "stack {:.0} / reach {:.0} / HTA {:.1}° / {} mm tire",
-                    f.stack_mm, f.reach_mm, f.head_tube_angle_deg, f.tire_width_mm as i32,
-                ));
             });
         });
 
         let style = self.current_style();
+
+        egui::SidePanel::left("frame-editor")
+            .resizable(true)
+            .default_width(280.0)
+            .min_width(240.0)
+            .show(ctx, |ui| {
+                ui.add_space(4.0);
+                ui.heading("Frame");
+                ui.add_space(4.0);
+
+                if ui::frame_editor::show(ui, &mut self.state.frame) {
+                    state_dirty = true;
+                }
+
+                ui.add_space(8.0);
+                ui.horizontal(|ui| {
+                    let diverged = self.frame_diverged_from_preset();
+                    let btn = egui::Button::new("Reset to preset");
+                    if ui.add_enabled(diverged, btn).clicked() && self.reset_frame_to_preset() {
+                        state_dirty = true;
+                    }
+                    if diverged {
+                        ui.label(
+                            egui::RichText::new("edited")
+                                .italics()
+                                .color(egui::Color32::from_rgb(180, 140, 80)),
+                        );
+                    }
+                });
+            });
+
         egui::CentralPanel::default()
             .frame(egui::Frame::none().fill(style.background))
             .show(ctx, |ui| {
