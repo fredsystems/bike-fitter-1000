@@ -5,13 +5,15 @@
 //! native `bike-fit-app` binary and (eventually) the wasm `bike-fit-web`
 //! crate hand it a [`Persistence`] impl and let it run.
 
+pub mod frames;
 pub mod render;
 
 use std::sync::Arc;
 
-use bike_fit_core::{frame::WheelSize, Cockpit, FitProfile, Frame, Point};
+use bike_fit_core::{Cockpit, FitProfile, Frame, Point};
 use eframe::egui;
 
+pub use frames::Preset;
 pub use render::{paint_frame, paint_frame_with_overlay, show_frame, RenderStyle};
 
 /// Pluggable storage backend.
@@ -30,6 +32,14 @@ pub trait Persistence: Send + Sync + 'static {
 /// In-memory persistent state. Plain data, no UI.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AppState {
+    /// Stable identifier for the active frame. Looked up against
+    /// [`frames::all`]; falls back to the first preset if the key is unknown
+    /// (e.g. if a user-edited `frame` was persisted under a key we no longer
+    /// know about, but the inline `frame` field is still authoritative).
+    pub active_frame_key: String,
+    /// Authoritative active frame. Initially populated from a preset, but
+    /// edits in the frame editor (milestone 4) write into this field
+    /// directly, decoupling it from the preset library.
     pub frame: Frame,
     pub fit: FitProfile,
     pub cockpit: Cockpit,
@@ -37,8 +47,11 @@ pub struct AppState {
 
 impl Default for AppState {
     fn default() -> Self {
+        let presets = frames::all();
+        let first = presets.into_iter().next().expect("at least one preset");
         Self {
-            frame: default_demo_frame(),
+            active_frame_key: first.key.to_string(),
+            frame: first.frame,
             fit: FitProfile::new(
                 "rider-1",
                 Point::new(-50.0, 730.0),
@@ -49,87 +62,107 @@ impl Default for AppState {
     }
 }
 
-/// A reasonable starter frame so the UI has something to draw on first run.
-/// Mirrors the Aeroad 2XS reference frame from `AGENTS.md` §13.
-pub fn default_demo_frame() -> Frame {
-    Frame {
-        manufacturer: "Canyon".into(),
-        model: "Aeroad CF SLX 7".into(),
-        size_label: "2XS".into(),
-        year: Some(2025),
-        stack_mm: 498.0,
-        reach_mm: 372.0,
-        head_tube_angle_deg: 70.0,
-        head_tube_length_mm: 88.0,
-        seat_tube_angle_deg: 73.5,
-        seat_tube_length_mm: 441.0,
-        top_tube_effective_mm: 516.0,
-        bb_drop_mm: 70.0,
-        chainstay_mm: 410.0,
-        fork_rake_mm: 40.6,
-        front_center_horizontal_mm: Some(571.0),
-        wheel_size: WheelSize::Iso622,
-        tire_width_mm: 28.0,
-    }
-}
-
 /// The shared application — an [`eframe::App`] that doesn't know whether it's
 /// running on the desktop or in a browser.
 pub struct App {
     state: AppState,
-    // Wired up now; will be invoked from real edits in milestones 4–6.
-    #[allow(dead_code)]
     persistence: Arc<dyn Persistence>,
-    style: RenderStyle,
 }
 
 impl App {
     pub fn new(persistence: Arc<dyn Persistence>) -> Self {
         let state = persistence.load().unwrap_or_default();
-        Self {
-            state,
-            persistence,
-            style: RenderStyle::default(),
+        Self { state, persistence }
+    }
+
+    fn persist(&self) {
+        self.persistence.save(&self.state);
+    }
+
+    /// Replace the active frame with the named preset, if it exists.
+    fn select_preset(&mut self, key: &str) {
+        if let Some(p) = frames::by_key(key) {
+            self.state.active_frame_key = p.key.to_string();
+            self.state.frame = p.frame;
         }
     }
 
-    #[allow(dead_code)]
-    fn save(&self) {
-        self.persistence.save(&self.state);
+    /// Render style for the currently-active frame: default style tinted by
+    /// the active key so each preset has a visibly distinct background.
+    fn current_style(&self) -> RenderStyle {
+        RenderStyle::default().with_background_for_key(&self.state.active_frame_key)
     }
 }
 
 impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        let mut state_dirty = false;
+
         egui::TopBottomPanel::top("title-bar").show(ctx, |ui| {
             ui.horizontal(|ui| {
                 ui.heading("bike-fitter-1000");
                 ui.separator();
+                ui.label("Frame:");
+
+                let presets = frames::all();
+                let current_label = preset_label(&self.state);
+                let mut chosen: Option<String> = None;
+                egui::ComboBox::from_id_salt("frame-picker")
+                    .selected_text(current_label)
+                    .width(280.0)
+                    .show_ui(ui, |ui| {
+                        for p in &presets {
+                            let label = format!(
+                                "{} {} ({})",
+                                p.frame.manufacturer, p.frame.model, p.frame.size_label,
+                            );
+                            let selected = self.state.active_frame_key == p.key;
+                            if ui.selectable_label(selected, label).clicked() {
+                                chosen = Some(p.key.to_string());
+                            }
+                        }
+                    });
+                if let Some(key) = chosen {
+                    if key != self.state.active_frame_key {
+                        self.select_preset(&key);
+                        state_dirty = true;
+                    }
+                }
+
+                ui.separator();
+                let f = &self.state.frame;
                 ui.label(format!(
-                    "{} {} ({})",
-                    self.state.frame.manufacturer,
-                    self.state.frame.model,
-                    self.state.frame.size_label,
+                    "stack {:.0} / reach {:.0} / HTA {:.1}° / {} mm tire",
+                    f.stack_mm, f.reach_mm, f.head_tube_angle_deg, f.tire_width_mm as i32,
                 ));
             });
         });
 
-        egui::CentralPanel::default().show(ctx, |ui| {
-            // Render the frame side-view filling the central panel.
-            let painter_rect = ui.available_rect_before_wrap();
-            let painter = ui.painter_at(painter_rect);
-            render::paint_frame_with_overlay(
-                &painter,
-                painter_rect,
-                &self.state.frame,
-                Some(self.state.fit.saddle),
-                Some(self.state.fit.bar_target),
-                &self.style,
-            );
-        });
+        let style = self.current_style();
+        egui::CentralPanel::default()
+            .frame(egui::Frame::none().fill(style.background))
+            .show(ctx, |ui| {
+                let painter_rect = ui.available_rect_before_wrap();
+                let painter = ui.painter_at(painter_rect);
+                render::paint_frame_with_overlay(
+                    &painter,
+                    painter_rect,
+                    &self.state.frame,
+                    Some(self.state.fit.saddle),
+                    Some(self.state.fit.bar_target),
+                    &style,
+                );
+            });
 
-        // Persistence is wired up but won't write until something actually
-        // edits state — keeping the per-frame save call at no cost. We'll hook
-        // it from real edits in milestones 4–6.
+        if state_dirty {
+            self.persist();
+        }
     }
+}
+
+fn preset_label(state: &AppState) -> String {
+    format!(
+        "{} {} ({})",
+        state.frame.manufacturer, state.frame.model, state.frame.size_label,
+    )
 }

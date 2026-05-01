@@ -42,6 +42,32 @@ impl Default for RenderStyle {
     }
 }
 
+impl RenderStyle {
+    /// Return a copy with a background color deterministically derived from
+    /// `key`. The palette is a handful of muted, similar-luminance blues and
+    /// teals so the line-art look is preserved while different frames feel
+    /// visibly distinct when swapped.
+    pub fn with_background_for_key(mut self, key: &str) -> Self {
+        // Tiny FNV-1a so we don't pull in a hasher dep, and so the choice is
+        // stable across runs.
+        const PALETTE: &[Color32] = &[
+            Color32::from_rgb(74, 134, 188),  // default blue
+            Color32::from_rgb(82, 142, 168),  // teal-blue
+            Color32::from_rgb(96, 122, 168),  // indigo-blue
+            Color32::from_rgb(70, 150, 170),  // cool teal
+            Color32::from_rgb(110, 130, 170), // slate-blue
+            Color32::from_rgb(64, 148, 160),  // deep teal
+        ];
+        let mut h: u32 = 0x811c_9dc5;
+        for b in key.as_bytes() {
+            h ^= u32::from(*b);
+            h = h.wrapping_mul(0x0100_0193);
+        }
+        self.background = PALETTE[(h as usize) % PALETTE.len()];
+        self
+    }
+}
+
 /// One frame rendered into one egui rect. Returns the [`Response`] for the
 /// allocated canvas so the caller can wire interaction later.
 pub fn show_frame(ui: &mut Ui, frame: &Frame, style: &RenderStyle) -> egui::Response {
