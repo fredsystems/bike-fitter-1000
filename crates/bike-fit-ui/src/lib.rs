@@ -32,35 +32,98 @@ pub trait Persistence: Send + Sync + 'static {
     fn save(&self, state: &AppState);
 }
 
+/// One bike: a chosen frame plus the cockpit configuration the solver should
+/// search over for it.
+///
+/// `active_frame_key` is the stable key from `data/bikes.json`; it's a
+/// breadcrumb for "which preset is this based on" so the user can reset to
+/// the preset definition. The `frame` field is authoritative — edits in the
+/// frame editor write directly into it and the key is just a label.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct Bike {
+    pub active_frame_key: String,
+    pub frame: Frame,
+    pub cockpit: Cockpit,
+}
+
+impl Bike {
+    fn from_preset(p: Preset) -> Self {
+        Self {
+            active_frame_key: p.key,
+            frame: p.frame,
+            cockpit: Cockpit::default_traditional(),
+        }
+    }
+
+    /// Pick the nth preset (clamped); used for sensible per-bike defaults.
+    fn from_nth_preset(n: usize) -> Self {
+        let presets = frames::all();
+        let idx = n.min(presets.len().saturating_sub(1));
+        Self::from_preset(
+            presets
+                .into_iter()
+                .nth(idx)
+                .expect("at least one preset; verified by frames::all"),
+        )
+    }
+}
+
+/// Whether the app is showing one bike or comparing two.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum AppMode {
+    #[default]
+    Single,
+    Compare,
+}
+
+/// Which bike a UI control is editing.
+///
+/// Internal helper, not persisted.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum BikeSlot {
+    A,
+    B,
+}
+
 /// In-memory persistent state. Plain data, no UI.
+///
+/// Compare mode keeps two [`Bike`]s in lockstep against a single shared
+/// [`FitProfile`]: that's the whole point — same fit, two frames, what
+/// cockpit gets you there?
+///
+/// `bike_b` and `mode` are `#[serde(default)]` so loading an older persisted
+/// state file (pre-milestone-8) keeps working: the user comes back to Single
+/// mode with their original bike and a freshly-defaulted bike B sitting in
+/// the wings.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AppState {
-    /// Stable identifier for the active frame. Looked up against
-    /// [`frames::all`]; falls back to the first preset if the key is unknown
-    /// (e.g. if a user-edited `frame` was persisted under a key we no longer
-    /// know about, but the inline `frame` field is still authoritative).
-    pub active_frame_key: String,
-    /// Authoritative active frame. Initially populated from a preset, but
-    /// edits in the frame editor (milestone 4) write into this field
-    /// directly, decoupling it from the preset library.
-    pub frame: Frame,
+    pub bike_a: Bike,
+    #[serde(default = "Bike::default_b")]
+    pub bike_b: Bike,
     pub fit: FitProfile,
-    pub cockpit: Cockpit,
+    #[serde(default)]
+    pub mode: AppMode,
+}
+
+impl Bike {
+    fn default_b() -> Self {
+        // Default bike B to the second preset so a fresh comparison shows
+        // two visibly different frames.
+        Self::from_nth_preset(1)
+    }
 }
 
 impl Default for AppState {
     fn default() -> Self {
-        let presets = frames::all();
-        let first = presets.into_iter().next().expect("at least one preset");
         Self {
-            active_frame_key: first.key.to_string(),
-            frame: first.frame,
+            bike_a: Bike::from_nth_preset(0),
+            bike_b: Bike::default_b(),
             fit: FitProfile::new(
                 "rider-1",
                 Point::new(-50.0, 730.0),
                 Point::new(420.0, 580.0),
             ),
-            cockpit: Cockpit::default_traditional(),
+            mode: AppMode::Single,
         }
     }
 }
@@ -70,48 +133,64 @@ impl Default for AppState {
 pub struct App {
     state: AppState,
     persistence: Arc<dyn Persistence>,
+    /// Which bike the left frame-editor panel is currently editing. Only
+    /// meaningful in `AppMode::Compare`. Not persisted.
+    editing_slot: BikeSlot,
 }
 
 impl App {
     pub fn new(persistence: Arc<dyn Persistence>) -> Self {
         let state = persistence.load().unwrap_or_default();
-        Self { state, persistence }
+        Self {
+            state,
+            persistence,
+            editing_slot: BikeSlot::A,
+        }
     }
 
     fn persist(&self) {
         self.persistence.save(&self.state);
     }
 
-    /// Replace the active frame with the named preset, if it exists.
-    fn select_preset(&mut self, key: &str) {
-        if let Some(p) = frames::by_key(key) {
-            self.state.active_frame_key = p.key.to_string();
-            self.state.frame = p.frame;
+    fn bike(&self, slot: BikeSlot) -> &Bike {
+        match slot {
+            BikeSlot::A => &self.state.bike_a,
+            BikeSlot::B => &self.state.bike_b,
         }
     }
 
-    /// Re-apply the active preset to the live frame, discarding any local
-    /// edits. No-op if the active key isn't in the preset list (e.g. for a
-    /// frame the user fully authored).
-    fn reset_frame_to_preset(&mut self) -> bool {
-        if let Some(p) = frames::by_key(&self.state.active_frame_key) {
-            if self.state.frame != p.frame {
-                self.state.frame = p.frame;
+    fn bike_mut(&mut self, slot: BikeSlot) -> &mut Bike {
+        match slot {
+            BikeSlot::A => &mut self.state.bike_a,
+            BikeSlot::B => &mut self.state.bike_b,
+        }
+    }
+
+    /// Re-apply the active preset to `slot`'s live frame, discarding any
+    /// local edits. No-op if the active key isn't in the preset list (e.g.
+    /// for a frame the user fully authored).
+    fn reset_frame_to_preset(&mut self, slot: BikeSlot) -> bool {
+        let key = self.bike(slot).active_frame_key.clone();
+        if let Some(p) = frames::by_key(&key) {
+            let bike = self.bike_mut(slot);
+            if bike.frame != p.frame {
+                bike.frame = p.frame;
                 return true;
             }
         }
         false
     }
 
-    /// Has the live frame diverged from its preset?
-    fn frame_diverged_from_preset(&self) -> bool {
-        frames::by_key(&self.state.active_frame_key).is_some_and(|p| p.frame != self.state.frame)
+    /// Has `slot`'s live frame diverged from its preset?
+    fn frame_diverged_from_preset(&self, slot: BikeSlot) -> bool {
+        let bike = self.bike(slot);
+        frames::by_key(&bike.active_frame_key).is_some_and(|p| p.frame != bike.frame)
     }
 
-    /// Render style for the currently-active frame: default style tinted by
-    /// the active key so each preset has a visibly distinct background.
-    fn current_style(&self) -> RenderStyle {
-        RenderStyle::default().with_background_for_key(&self.state.active_frame_key)
+    /// Render style for `slot`: default style tinted by the active key so
+    /// each bike has a visibly distinct background, even side-by-side.
+    fn style_for(&self, slot: BikeSlot) -> RenderStyle {
+        RenderStyle::default().with_background_for_key(&self.bike(slot).active_frame_key)
     }
 }
 
@@ -119,60 +198,103 @@ impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         let mut state_dirty = false;
 
+        // --- Title bar: app name, mode toggle, frame picker(s) ---
         egui::TopBottomPanel::top("title-bar").show(ctx, |ui| {
             ui.horizontal(|ui| {
                 ui.heading("bike-fitter-1000");
                 ui.separator();
-                ui.label("Frame:");
 
-                let presets = frames::all();
-                let current_label = preset_label(&self.state);
-                let mut chosen: Option<String> = None;
-                egui::ComboBox::from_id_salt("frame-picker")
-                    .selected_text(current_label)
-                    .width(280.0)
-                    .show_ui(ui, |ui| {
-                        for p in &presets {
-                            let label = format!(
-                                "{} {} ({})",
-                                p.frame.manufacturer, p.frame.model, p.frame.size_label,
-                            );
-                            let selected = self.state.active_frame_key == p.key;
-                            if ui.selectable_label(selected, label).clicked() {
-                                chosen = Some(p.key.to_string());
-                            }
-                        }
-                    });
-                if let Some(key) = chosen {
-                    if key != self.state.active_frame_key {
-                        self.select_preset(&key);
+                // Mode toggle.
+                let mut mode = self.state.mode;
+                ui.label("Mode:");
+                if ui
+                    .selectable_label(mode == AppMode::Single, "Single")
+                    .clicked()
+                {
+                    mode = AppMode::Single;
+                }
+                if ui
+                    .selectable_label(mode == AppMode::Compare, "Compare")
+                    .clicked()
+                {
+                    mode = AppMode::Compare;
+                }
+                if mode != self.state.mode {
+                    self.state.mode = mode;
+                    // When entering Compare, default editing focus to A so
+                    // the side-panel labels make sense.
+                    if mode == AppMode::Compare {
+                        self.editing_slot = BikeSlot::A;
+                    }
+                    state_dirty = true;
+                }
+                ui.separator();
+
+                // Frame picker(s).
+                if matches!(self.state.mode, AppMode::Single) {
+                    if frame_picker(ui, "frame-picker-a", "Frame", &mut self.state.bike_a) {
+                        state_dirty = true;
+                    }
+                } else {
+                    if frame_picker(ui, "frame-picker-a", "A", &mut self.state.bike_a) {
+                        state_dirty = true;
+                    }
+                    ui.separator();
+                    if frame_picker(ui, "frame-picker-b", "B", &mut self.state.bike_b) {
                         state_dirty = true;
                     }
                 }
             });
         });
 
-        let style = self.current_style();
-
+        // --- Left side panel: frame editor (for one slot) + fit editor ---
         egui::SidePanel::left("frame-editor")
             .resizable(true)
             .default_width(280.0)
             .min_width(240.0)
             .show(ctx, |ui| {
                 egui::ScrollArea::vertical().show(ui, |ui| {
+                    // In Compare mode, let the user pick which bike's frame
+                    // they're editing. In Single mode, slot is forced to A.
+                    if matches!(self.state.mode, AppMode::Compare) {
+                        ui.add_space(4.0);
+                        ui.horizontal(|ui| {
+                            ui.label("Editing:");
+                            if ui
+                                .selectable_label(self.editing_slot == BikeSlot::A, "Bike A")
+                                .clicked()
+                            {
+                                self.editing_slot = BikeSlot::A;
+                            }
+                            if ui
+                                .selectable_label(self.editing_slot == BikeSlot::B, "Bike B")
+                                .clicked()
+                            {
+                                self.editing_slot = BikeSlot::B;
+                            }
+                        });
+                        ui.separator();
+                    } else {
+                        self.editing_slot = BikeSlot::A;
+                    }
+
+                    let slot = self.editing_slot;
+
                     ui.add_space(4.0);
                     ui.heading("Frame");
                     ui.add_space(4.0);
 
-                    if ui::frame_editor::show(ui, &mut self.state.frame) {
+                    if ui::frame_editor::show(ui, &mut self.bike_mut(slot).frame) {
                         state_dirty = true;
                     }
 
                     ui.add_space(8.0);
                     ui.horizontal(|ui| {
-                        let diverged = self.frame_diverged_from_preset();
+                        let diverged = self.frame_diverged_from_preset(slot);
                         let btn = egui::Button::new("Reset to preset");
-                        if ui.add_enabled(diverged, btn).clicked() && self.reset_frame_to_preset() {
+                        if ui.add_enabled(diverged, btn).clicked()
+                            && self.reset_frame_to_preset(slot)
+                        {
                             state_dirty = true;
                         }
                         if diverged {
@@ -189,6 +311,12 @@ impl eframe::App for App {
                     ui.add_space(4.0);
                     ui.heading("Fit");
                     ui.add_space(4.0);
+                    ui.label(
+                        egui::RichText::new("Shared between both bikes — same rider, same target.")
+                            .small()
+                            .weak(),
+                    );
+                    ui.add_space(4.0);
 
                     if ui::fit_editor::show(ui, &mut self.state.fit) {
                         state_dirty = true;
@@ -196,61 +324,68 @@ impl eframe::App for App {
                 });
             });
 
+        // --- Right side panel: cockpit + solver, per bike ---
         egui::SidePanel::right("cockpit-and-solver")
             .resizable(true)
-            .default_width(300.0)
-            .min_width(260.0)
+            .default_width(310.0)
+            .min_width(270.0)
             .show(ctx, |ui| {
                 egui::ScrollArea::vertical().show(ui, |ui| {
                     ui.add_space(4.0);
-                    ui.heading("Cockpit");
-                    ui.add_space(4.0);
-
-                    if ui::cockpit_editor::show(ui, &mut self.state.cockpit) {
-                        state_dirty = true;
-                    }
-
-                    ui.add_space(12.0);
-                    ui.separator();
-                    ui.add_space(4.0);
-                    ui.heading("Solver");
-                    ui.add_space(4.0);
-
-                    ui::solver_panel::show(
+                    show_cockpit_and_solver(
                         ui,
-                        &self.state.frame,
+                        if matches!(self.state.mode, AppMode::Compare) {
+                            "Bike A"
+                        } else {
+                            "Cockpit"
+                        },
                         &self.state.fit,
-                        &self.state.cockpit,
+                        &mut self.state.bike_a,
+                        &mut state_dirty,
                     );
+                    if matches!(self.state.mode, AppMode::Compare) {
+                        ui.add_space(16.0);
+                        ui.separator();
+                        ui.add_space(4.0);
+                        show_cockpit_and_solver(
+                            ui,
+                            "Bike B",
+                            &self.state.fit,
+                            &mut self.state.bike_b,
+                            &mut state_dirty,
+                        );
+                    }
                 });
             });
 
+        // --- Central panel: bike rendering(s) ---
         egui::CentralPanel::default()
-            .frame(egui::Frame::none().fill(style.background))
+            .frame(egui::Frame::none())
             .show(ctx, |ui| {
-                let painter_rect = ui.available_rect_before_wrap();
-                let painter = ui.painter_at(painter_rect);
-                render::paint_frame_with_overlay(
-                    &painter,
-                    painter_rect,
-                    &self.state.frame,
-                    Some(self.state.fit.saddle),
-                    Some(self.state.fit.bar_target),
-                    &style,
-                );
-                if let Ok(build) = bike_fit_core::solver::solve_for_profile(
-                    &self.state.frame,
-                    &self.state.fit,
-                    &self.state.cockpit,
-                ) {
-                    render::paint_achieved_overlay(
-                        &painter,
-                        painter_rect,
-                        &self.state.frame,
-                        Some(self.state.fit.bar_target),
-                        build.achieved_bar_position,
-                        &style,
-                    );
+                let outer = ui.available_rect_before_wrap();
+                match self.state.mode {
+                    AppMode::Single => {
+                        let style = self.style_for(BikeSlot::A);
+                        paint_canvas_for(ui, outer, &style, &self.state.bike_a, &self.state.fit);
+                    }
+                    AppMode::Compare => {
+                        // Split horizontally at the midpoint. A small gutter
+                        // between the two halves keeps them visually separate.
+                        let gutter = 2.0;
+                        let mid = outer.center().x;
+                        let left = egui::Rect::from_min_max(
+                            outer.min,
+                            egui::pos2(mid - gutter / 2.0, outer.max.y),
+                        );
+                        let right = egui::Rect::from_min_max(
+                            egui::pos2(mid + gutter / 2.0, outer.min.y),
+                            outer.max,
+                        );
+                        let style_a = self.style_for(BikeSlot::A);
+                        let style_b = self.style_for(BikeSlot::B);
+                        paint_canvas_for(ui, left, &style_a, &self.state.bike_a, &self.state.fit);
+                        paint_canvas_for(ui, right, &style_b, &self.state.bike_b, &self.state.fit);
+                    }
                 }
             });
 
@@ -260,9 +395,107 @@ impl eframe::App for App {
     }
 }
 
-fn preset_label(state: &AppState) -> String {
-    format!(
+/// Combo box for picking a preset frame. Mutates `bike` in place; returns
+/// `true` if the selection changed.
+fn frame_picker(ui: &mut egui::Ui, id: &str, label: &str, bike: &mut Bike) -> bool {
+    ui.label(format!("{label}:"));
+    let presets = frames::all();
+    let current_label = format!(
         "{} {} ({})",
-        state.frame.manufacturer, state.frame.model, state.frame.size_label,
-    )
+        bike.frame.manufacturer, bike.frame.model, bike.frame.size_label,
+    );
+    let mut chosen: Option<String> = None;
+    egui::ComboBox::from_id_salt(id)
+        .selected_text(current_label)
+        .width(260.0)
+        .show_ui(ui, |ui| {
+            for p in &presets {
+                let entry = format!(
+                    "{} {} ({})",
+                    p.frame.manufacturer, p.frame.model, p.frame.size_label,
+                );
+                let selected = bike.active_frame_key == p.key;
+                if ui.selectable_label(selected, entry).clicked() {
+                    chosen = Some(p.key.clone());
+                }
+            }
+        });
+    if let Some(key) = chosen {
+        if key != bike.active_frame_key {
+            if let Some(p) = frames::by_key(&key) {
+                bike.active_frame_key = p.key;
+                bike.frame = p.frame;
+                return true;
+            }
+        }
+    }
+    false
+}
+
+/// Render the right-panel "Cockpit + Solver" stack for one bike. Sets
+/// `*dirty = true` if the user edited the cockpit.
+fn show_cockpit_and_solver(
+    ui: &mut egui::Ui,
+    title: &str,
+    fit: &FitProfile,
+    bike: &mut Bike,
+    dirty: &mut bool,
+) {
+    ui.heading(title);
+    ui.add_space(4.0);
+    ui.label(
+        egui::RichText::new(format!(
+            "{} {} ({})",
+            bike.frame.manufacturer, bike.frame.model, bike.frame.size_label,
+        ))
+        .small()
+        .weak(),
+    );
+    ui.add_space(6.0);
+
+    // Cockpit-editor and solver-panel namespace their widget IDs internally
+    // by id_salt — but two instances of the same panel collide. Push a scope
+    // per bike so egui considers them distinct.
+    ui.push_id(title, |ui| {
+        if ui::cockpit_editor::show(ui, &mut bike.cockpit) {
+            *dirty = true;
+        }
+        ui.add_space(8.0);
+        ui.separator();
+        ui.add_space(4.0);
+        ui.label(egui::RichText::new("Solver").strong());
+        ui.add_space(2.0);
+        ui::solver_panel::show(ui, &bike.frame, fit, &bike.cockpit);
+    });
+}
+
+/// Draw one bike's canvas (frame + saddle/bar overlay + solver achieved
+/// overlay) into `rect`, with `style.background` filling the rect.
+fn paint_canvas_for(
+    ui: &egui::Ui,
+    rect: egui::Rect,
+    style: &RenderStyle,
+    bike: &Bike,
+    fit: &FitProfile,
+) {
+    let painter = ui.painter_at(rect);
+    painter.rect_filled(rect, 0.0, style.background);
+    render::paint_frame_with_overlay(
+        &painter,
+        rect,
+        &bike.frame,
+        Some(fit.saddle),
+        Some(fit.bar_target),
+        style,
+    );
+    if let Ok(build) = bike_fit_core::solver::solve_for_profile(&bike.frame, fit, &bike.cockpit) {
+        render::paint_achieved_overlay(
+            &painter,
+            rect,
+            &bike.frame,
+            Some(fit.bar_target),
+            build.achieved_bar_position,
+            style,
+        );
+    }
 }
