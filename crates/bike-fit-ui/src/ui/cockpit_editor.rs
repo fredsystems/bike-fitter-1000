@@ -112,17 +112,35 @@ pub fn show(ui: &mut Ui, cockpit: &mut Cockpit) -> bool {
     match cockpit {
         Cockpit::Traditional { stems, .. } | Cockpit::AeroStem { stems, .. } => {
             egui::CollapsingHeader::new("Stem catalog")
-                .default_open(false)
+                .default_open(true)
                 .show(ui, |ui| {
                     ui.label(
-                        egui::RichText::new(format!(
-                            "{} stems: {}",
-                            stems.stems.len(),
-                            stem_summary(stems)
-                        ))
-                        .small()
-                        .weak(),
+                        egui::RichText::new(format!("{} stems available", stems.stems.len()))
+                            .small()
+                            .weak(),
                     );
+                    ui.label(egui::RichText::new(stem_summary(stems)).small().weak());
+                    ui.add_space(4.0);
+                    // Show every stem so the user can see exactly what the
+                    // solver is choosing from. Wrapped in a small scroll
+                    // area so a 28-stem default catalog doesn't push the
+                    // solver panel off-screen.
+                    egui::ScrollArea::vertical()
+                        .id_salt("stem-list")
+                        .max_height(140.0)
+                        .show(ui, |ui| {
+                            for stem in &stems.stems {
+                                ui.label(
+                                    egui::RichText::new(format!(
+                                        "  {:>3.0} mm  ×  {:+.0}°",
+                                        stem.length_mm, stem.angle_deg,
+                                    ))
+                                    .monospace()
+                                    .small(),
+                                );
+                            }
+                        });
+                    ui.add_space(4.0);
                     if ui.button("Reset to default catalog").clicked() {
                         *stems = StemCatalog::default_traditional();
                         changed = true;
@@ -131,13 +149,15 @@ pub fn show(ui: &mut Ui, cockpit: &mut Cockpit) -> bool {
         }
         Cockpit::Integrated { skus, .. } => {
             egui::CollapsingHeader::new("Integrated SKUs")
-                .default_open(false)
+                .default_open(true)
                 .show(ui, |ui| {
                     if skus.is_empty() {
                         ui.label(
                             egui::RichText::new(
-                                "No SKUs configured. Add some via the API; \
-                                 inline editor TBD.",
+                                "No SKUs configured. The solver has nothing \
+                                 to search over until you add one. Inline \
+                                 editor TBD; for now, switch back to \
+                                 Traditional or Aero stem.",
                             )
                             .small()
                             .weak(),
@@ -146,9 +166,10 @@ pub fn show(ui: &mut Ui, cockpit: &mut Cockpit) -> bool {
                         for sku in skus.iter() {
                             ui.label(
                                 egui::RichText::new(format!(
-                                    "{:.0} mm × {:+.0}° (bar reach {:.0}, drop {:.0})",
+                                    "  {:>3.0} mm  ×  {:+.0}°  (bar reach {:.0}, drop {:.0})",
                                     sku.length_mm, sku.angle_deg, sku.bar_reach_mm, sku.bar_drop_mm,
                                 ))
+                                .monospace()
                                 .small(),
                             );
                         }
