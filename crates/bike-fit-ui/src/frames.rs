@@ -28,8 +28,8 @@ pub fn all() -> Vec<Preset> {
             frame: endurace_3xs_2025(),
         },
         Preset {
-            key: "specialized-tarmac-sl8-m-2025",
-            frame: tarmac_sl8_m_2025(),
+            key: "specialized-tarmac-sl8-44-2025",
+            frame: tarmac_sl8_44_2025(),
         },
     ]
 }
@@ -97,12 +97,12 @@ pub fn endurace_3xs_2025() -> Frame {
     }
 }
 
-/// Specialized Tarmac SL8 size M, 2025.
-pub fn tarmac_sl8_m_2025() -> Frame {
+/// Specialized Tarmac SL8 size 44, 2025.
+pub fn tarmac_sl8_44_2025() -> Frame {
     Frame {
         manufacturer: "Specialized".into(),
         model: "Tarmac SL8".into(),
-        size_label: "M".into(),
+        size_label: "44".into(),
         year: Some(2025),
         stack_mm: 501.0,
         reach_mm: 366.0,

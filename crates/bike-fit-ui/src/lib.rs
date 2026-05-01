@@ -157,27 +157,39 @@ impl eframe::App for App {
             .default_width(280.0)
             .min_width(240.0)
             .show(ctx, |ui| {
-                ui.add_space(4.0);
-                ui.heading("Frame");
-                ui.add_space(4.0);
+                egui::ScrollArea::vertical().show(ui, |ui| {
+                    ui.add_space(4.0);
+                    ui.heading("Frame");
+                    ui.add_space(4.0);
 
-                if ui::frame_editor::show(ui, &mut self.state.frame) {
-                    state_dirty = true;
-                }
-
-                ui.add_space(8.0);
-                ui.horizontal(|ui| {
-                    let diverged = self.frame_diverged_from_preset();
-                    let btn = egui::Button::new("Reset to preset");
-                    if ui.add_enabled(diverged, btn).clicked() && self.reset_frame_to_preset() {
+                    if ui::frame_editor::show(ui, &mut self.state.frame) {
                         state_dirty = true;
                     }
-                    if diverged {
-                        ui.label(
-                            egui::RichText::new("edited")
-                                .italics()
-                                .color(egui::Color32::from_rgb(180, 140, 80)),
-                        );
+
+                    ui.add_space(8.0);
+                    ui.horizontal(|ui| {
+                        let diverged = self.frame_diverged_from_preset();
+                        let btn = egui::Button::new("Reset to preset");
+                        if ui.add_enabled(diverged, btn).clicked() && self.reset_frame_to_preset() {
+                            state_dirty = true;
+                        }
+                        if diverged {
+                            ui.label(
+                                egui::RichText::new("edited")
+                                    .italics()
+                                    .color(egui::Color32::from_rgb(180, 140, 80)),
+                            );
+                        }
+                    });
+
+                    ui.add_space(12.0);
+                    ui.separator();
+                    ui.add_space(4.0);
+                    ui.heading("Fit");
+                    ui.add_space(4.0);
+
+                    if ui::fit_editor::show(ui, &mut self.state.fit) {
+                        state_dirty = true;
                     }
                 });
             });

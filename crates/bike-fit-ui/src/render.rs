@@ -24,8 +24,12 @@ pub struct RenderStyle {
     /// Padding (in screen pixels) between the bike's bounding rect and the
     /// edges of the canvas.
     pub padding_px: f32,
-    /// Optional accent dot color — used for overlays like saddle/bar targets.
+    /// Generic accent color (kept for future overlays / tests).
     pub accent: Color32,
+    /// Color of the saddle target dot.
+    pub saddle_accent: Color32,
+    /// Color of the bar target dot.
+    pub bar_accent: Color32,
 }
 
 impl Default for RenderStyle {
@@ -38,6 +42,10 @@ impl Default for RenderStyle {
             wheel_rim_band_alpha: 80,
             padding_px: 24.0,
             accent: Color32::from_rgb(255, 200, 60),
+            // Warm yellow for saddle, soft orange-red for bar — both legible
+            // against the muted-blue palette and visually distinct.
+            saddle_accent: Color32::from_rgb(255, 210, 80),
+            bar_accent: Color32::from_rgb(240, 110, 90),
         }
     }
 }
@@ -101,11 +109,24 @@ pub fn paint_frame_with_overlay(
     let world_bounds = bike_world_bounds(frame);
     let xform = Transform::fit(world_bounds, rect, style.padding_px);
     if let Some(p) = saddle {
-        painter.circle_filled(xform.world_to_screen(p), 4.0, style.accent);
+        paint_target_dot(
+            painter,
+            xform.world_to_screen(p),
+            style.saddle_accent,
+            style,
+        );
     }
     if let Some(p) = bar_target {
-        painter.circle_filled(xform.world_to_screen(p), 4.0, style.accent);
+        paint_target_dot(painter, xform.world_to_screen(p), style.bar_accent, style);
     }
+}
+
+/// Filled disc with a thin white ring around it, so target dots read on any
+/// background.
+fn paint_target_dot(painter: &egui::Painter, pos: Pos2, fill: Color32, style: &RenderStyle) {
+    let r = 5.0;
+    painter.circle_filled(pos, r, fill);
+    painter.circle_stroke(pos, r, Stroke::new(1.0, style.stroke));
 }
 
 // --- internals ---------------------------------------------------------------
