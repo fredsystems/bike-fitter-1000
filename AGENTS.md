@@ -21,18 +21,22 @@ professional fitter has a clear starting point.
 
 ## 2. Headline decisions
 
-| Decision                  | Choice                                                                        |
-| ------------------------- | ----------------------------------------------------------------------------- |
-| Language / GUI            | **Rust + egui** (via `eframe`)                                                |
-| Scope of v1               | Full thing: bundled bike DB + multiple fit profiles + side-by-side comparison |
-| Fit input model           | **BB-relative coordinates** for both saddle and bar target points             |
-| Units                     | Millimeters and degrees only (no inch toggle)                                 |
-| Bike DB                   | Hand-curated JSON in `data/bikes.json`, versioned in repo                     |
-| Reference rendering style | Bike Insights "bike-on-bike" line-art (see `docs/reference-rendering.png`)    |
-| Stem angle convention     | Angle relative to perpendicular-to-steerer (industry standard)                |
-| Default spacer SKUs       | `[3, 5, 10, 20]` mm, max stack 60 mm                                          |
-| Default stem catalog      | Lengths 70–130 mm in 10 mm steps; angles ±6° and ±17°                         |
-| Headset top cap default   | 5 mm, configurable per build                                                  |
+| Decision                  | Choice                                                                                 |
+| ------------------------- | -------------------------------------------------------------------------------------- |
+| Language / GUI            | **Rust + egui** (via `eframe`); same UI code targets native and web                    |
+| Scope of v1               | Full thing: bundled bike DB + multiple fit profiles + side-by-side comparison          |
+| Native target             | Built and prioritized first; primary development target through milestone 8            |
+| Web target                | wasm32 + WebGL via `eframe`, added as milestone 9 once native is feature-complete      |
+| Web sharing               | Self-contained URL fragment encoding the fit+frame — no backend                        |
+| Web hosting               | TBD (decided when we build the web target)                                             |
+| Fit input model           | **BB-relative coordinates** for both saddle and bar target points                      |
+| Units                     | Millimeters and degrees only (no inch toggle)                                          |
+| Bike DB                   | Hand-curated JSON in `data/bikes.json`, compiled in via `include_str!` for portability |
+| Reference rendering style | Bike Insights "bike-on-bike" line-art (see `docs/reference-rendering.png`)             |
+| Stem angle convention     | Angle relative to perpendicular-to-steerer (industry standard)                         |
+| Default spacer SKUs       | `[3, 5, 10, 20]` mm, max stack 60 mm                                                   |
+| Default stem catalog      | Lengths 70–130 mm in 10 mm steps; angles ±6° and ±17°                                  |
+| Headset top cap default   | 5 mm, configurable per build                                                           |
 
 ## 3. Coordinate convention
 
@@ -130,25 +134,28 @@ brute-force it. No need for analytic inversion.
 
 ```text
 bike-fitter-1000/
-├── flake.nix                       # Nix dev shell + buildable package
+├── flake.nix                       # Nix dev shell + buildable packages (native + wasm)
 ├── flake.lock
 ├── Cargo.toml                      # Workspace, dependency pinning
 ├── Cargo.lock                      # Committed (binary crate)
 ├── crates/
-│   ├── bike-fit-core/              # Pure logic, no UI
+│   ├── bike-fit-core/              # Pure logic, no UI, no platform deps
 │   │   ├── src/lib.rs              # Point, common types, re-exports
 │   │   ├── src/frame.rs            # Frame, derived points
 │   │   ├── src/fit.rs              # FitProfile (saddle + bar targets)
 │   │   ├── src/cockpit.rs          # Stem, Spacer, Cockpit kinds, catalogs
 │   │   ├── src/geometry.rs         # Vector math + derived geometry
 │   │   └── src/solver.rs           # solve_for_target, BuildResult
-│   └── bike-fit-app/               # egui binary `bike-fitter-1000`
-│       ├── src/main.rs
-│       ├── src/render.rs           # 2D side-view painter (matches reference)
-│       ├── src/ui/                 # Frame editor, fit editor, solver panel
-│       └── src/persistence.rs      # JSON save/load
+│   ├── bike-fit-ui/                # Shared egui UI: eframe::App impl, renderer, panels
+│   │   ├── src/lib.rs              # App struct, Persistence trait
+│   │   ├── src/render.rs           # 2D side-view painter (matches reference)
+│   │   └── src/ui/                 # Frame editor, fit editor, solver panel
+│   ├── bike-fit-app/               # Native bin `bike-fitter-1000`: thin shell + FilePersistence
+│   │   └── src/main.rs
+│   └── bike-fit-web/               # Wasm entrypoint (added at milestone 9): LocalStoragePersistence
+│       └── src/lib.rs
 ├── data/
-│   └── bikes.json                  # Bundled bike database
+│   └── bikes.json                  # Bundled bike database (compiled in via include_str!)
 ├── docs/
 │   ├── reference-rendering.png     # Visual style target
 │   └── geometry-math.md            # Full math derivation
@@ -195,12 +202,18 @@ Tracked in the running todo list. Status as of last update:
 
 1. ✅ **Repo scaffold** — flake cleanup, Cargo workspace, first commit.
 2. 🟡 **`bike-fit-core`** — types, geometry math, solver, unit tests.
-3. ⬜ **Side-view renderer** matching the reference style.
+3. ⬜ **Side-view renderer** matching the reference style. Lives in
+   `bike-fit-ui` (split out from the start so the web target is cheap
+   later).
 4. ⬜ **Frame editor UI** with live preview.
 5. ⬜ **Fit profile editor** with saddle/bar dot overlay.
 6. ⬜ **Cockpit picker + solver output panel**.
-7. ⬜ **Persistence + bundled `bikes.json`**.
+7. ⬜ **Persistence trait + bundled `bikes.json`**. Native impl writes
+   JSON to a config dir; bundled bikes use `include_str!` so the same DB
+   ships in both targets.
 8. ⬜ **Side-by-side comparison view**.
+9. ⬜ **Web target**: `bike-fit-web` wasm crate, `LocalStoragePersistence`,
+   URL-fragment encoding for shareable fits, `trunk` build, hosting TBD.
 
 ## 12. v1 simplifications (intentionally punted)
 
