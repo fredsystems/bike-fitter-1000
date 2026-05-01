@@ -185,6 +185,7 @@ name = "bike-fit-app"
 version = "0.1.0"
 dependencies = [
  "bike-fit-core",
+ "bike-fit-ui",
  "eframe",
  "egui",
  "env_logger",
@@ -200,6 +201,17 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror 1.0.69",
+]
+
+[[package]]
+name = "bike-fit-ui"
+version = "0.1.0"
+dependencies = [
+ "bike-fit-core",
+ "eframe",
+ "egui",
+ "log",
+ "serde",
 ]
 
 [[package]]

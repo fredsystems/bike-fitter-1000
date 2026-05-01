@@ -3,6 +3,7 @@ resolver = "2"
 members = [
   "crates/bike-fit-app",
   "crates/bike-fit-core",
+  "crates/bike-fit-ui",
 ]
 
 [workspace.package]
