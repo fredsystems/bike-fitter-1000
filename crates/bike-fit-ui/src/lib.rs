@@ -57,7 +57,7 @@ impl Bike {
         Self {
             active_frame_key: p.key,
             frame: p.frame,
-            cockpit: Cockpit::default_traditional(),
+            cockpit: p.default_cockpit.unwrap_or_else(Cockpit::default_traditional),
         }
     }
 
@@ -431,6 +431,9 @@ fn frame_picker(ui: &mut egui::Ui, id: &str, label: &str, bike: &mut Bike) -> bo
             if let Some(p) = frames::by_key(&key) {
                 bike.active_frame_key = p.key;
                 bike.frame = p.frame;
+                bike.cockpit = p
+                    .default_cockpit
+                    .unwrap_or_else(Cockpit::default_traditional);
                 return true;
             }
         }

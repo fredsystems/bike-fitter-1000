@@ -1,5 +1,5 @@
 {
-  "_comment": "Bundled bike frame database for bike-fitter-1000. Compiled into the binary via include_str!. Edit by hand; geometry is taken from manufacturer-published numbers (geometrygeeks.bike / bike-insights / OEM sites). The 'key' is a stable identifier — never rename it once shipped, or persisted user state will lose its selection. wheel_size is one of \"Iso622\" (700C/29\"), \"Iso584\" (650B/27.5\"), or {\"Custom\": <bsd_mm>}.",
+  "_comment": "Bundled bike frame database for bike-fitter-1000. Compiled into the binary via include_str!. Edit by hand; geometry is taken from manufacturer-published numbers (geometrygeeks.bike / bike-insights / OEM sites). The 'key' is a stable identifier — never rename it once shipped, or persisted user state will lose its selection. wheel_size is one of \"Iso622\" (700C/29\"), \"Iso584\" (650B/27.5\"), or {\"Custom\": <bsd_mm>}. Each entry may optionally carry a 'default_cockpit' (a full Cockpit value, externally tagged: \"Traditional\" / \"AeroStem\" / \"Integrated\") describing the OEM-prescribed cockpit; selecting the preset adopts it.",
   "frames": [
     {
       "key": "canyon-aeroad-cf-slx-7-2xs-2025",
@@ -46,6 +46,28 @@
       }
     },
     {
+      "key": "pinarello-dogma-x-43-2025",
+      "frame": {
+        "manufacturer": "Pinarello",
+        "model": "Dogma X",
+        "size_label": "43",
+        "year": 2025,
+        "stack_mm": 524.2,
+        "reach_mm": 349.3,
+        "head_tube_angle_deg": 70.0,
+        "head_tube_length_mm": 107.0,
+        "seat_tube_angle_deg": 74.4,
+        "seat_tube_length_mm": 430.0,
+        "top_tube_effective_mm": 505.0,
+        "bb_drop_mm": 77.0,
+        "chainstay_mm": 422.0,
+        "fork_rake_mm": 47.0,
+        "front_center_horizontal_mm": 551.9,
+        "wheel_size": "Iso622",
+        "tire_width_mm": 35.0
+      }
+    },
+    {
       "key": "specialized-tarmac-sl8-44-2025",
       "frame": {
         "manufacturer": "Specialized",
@@ -65,6 +87,35 @@
         "front_center_horizontal_mm": 566.7,
         "wheel_size": "Iso622",
         "tire_width_mm": 26.0
+      },
+      "default_cockpit": {
+        "Integrated": {
+          "skus": [
+            { "length_mm": 75.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 80.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 85.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 90.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 95.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 100.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 105.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 110.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 115.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 120.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 125.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 130.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 135.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 }
+          ],
+          "spacers": {
+            "spacers": [
+              { "height_mm": 3 },
+              { "height_mm": 5 },
+              { "height_mm": 10 },
+              { "height_mm": 20 }
+            ],
+            "max_stack_mm": 60
+          },
+          "headset_top_cap_mm": 5.0
+        }
       }
     }
   ]

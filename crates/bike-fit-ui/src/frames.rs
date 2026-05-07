@@ -13,14 +13,20 @@
 
 use std::sync::OnceLock;
 
-use bike_fit_core::Frame;
+use bike_fit_core::{Cockpit, Frame};
 use serde::Deserialize;
 
-/// One preset entry: a stable lookup key plus the frame itself.
+/// One preset entry: a stable lookup key, the frame itself, and an optional
+/// OEM-prescribed cockpit (e.g. the integrated bar/stem catalog the
+/// manufacturer ships with the bike).
 #[derive(Debug, Clone)]
 pub struct Preset {
     pub key: String,
     pub frame: Frame,
+    /// If `Some`, selecting this preset adopts this cockpit by default
+    /// (overwriting any prior cockpit on the bike). If `None`, the bike
+    /// falls back to [`Cockpit::default_traditional`].
+    pub default_cockpit: Option<Cockpit>,
 }
 
 /// Returns the bundled preset list. Order is the order shown in pickers,
@@ -46,6 +52,8 @@ struct BikesFile {
 struct RawPreset {
     key: String,
     frame: Frame,
+    #[serde(default)]
+    default_cockpit: Option<Cockpit>,
 }
 
 const BIKES_JSON: &str = include_str!("../../../data/bikes.json");
@@ -71,6 +79,7 @@ fn presets() -> &'static [Preset] {
             .map(|r| Preset {
                 key: r.key,
                 frame: r.frame,
+                default_cockpit: r.default_cockpit,
             })
             .collect()
     })
@@ -129,5 +138,34 @@ mod tests {
         assert_eq!(f.head_tube_angle_deg, 70.0);
         assert_eq!(f.front_center_horizontal_mm, Some(571.0));
         assert_eq!(f.wheel_size, WheelSize::Iso622);
+    }
+
+    #[test]
+    fn missing_default_cockpit_is_none() {
+        // Frames without a "default_cockpit" key in the JSON should leave
+        // the field as None so the bike falls back to the global default.
+        let p = by_key("canyon-aeroad-cf-slx-7-2xs-2025").expect("Aeroad preset present");
+        assert!(p.default_cockpit.is_none());
+    }
+
+    #[test]
+    fn tarmac_sl8_ships_with_integrated_cockpit() {
+        let p = by_key("specialized-tarmac-sl8-44-2025").expect("Tarmac preset present");
+        let cockpit = p
+            .default_cockpit
+            .as_ref()
+            .expect("Tarmac SL8 should have a default integrated cockpit");
+        match cockpit {
+            bike_fit_core::Cockpit::Integrated { skus, .. } => {
+                // 75..=135 in 5 mm steps = 13 SKUs.
+                assert_eq!(skus.len(), 13);
+                for sku in skus {
+                    assert!((sku.angle_deg - -10.0).abs() < 1e-9);
+                }
+                assert!((skus.first().unwrap().length_mm - 75.0).abs() < 1e-9);
+                assert!((skus.last().unwrap().length_mm - 135.0).abs() < 1e-9);
+            }
+            other => panic!("expected Integrated cockpit, got {other:?}"),
+        }
     }
 }
