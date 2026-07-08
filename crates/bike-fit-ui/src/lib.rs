@@ -203,11 +203,11 @@ impl App {
 }
 
 impl eframe::App for App {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
         let mut state_dirty = false;
 
         // --- Title bar: app name, mode toggle, frame picker(s) ---
-        egui::TopBottomPanel::top("title-bar").show(ctx, |ui| {
+        egui::Panel::top("title-bar").show(ui, |ui| {
             ui.horizontal(|ui| {
                 ui.heading("bike-fitter-1000");
                 ui.separator();
@@ -256,11 +256,11 @@ impl eframe::App for App {
         });
 
         // --- Left side panel: frame editor (for one slot) + fit editor ---
-        egui::SidePanel::left("frame-editor")
+        egui::Panel::left("frame-editor")
             .resizable(true)
-            .default_width(280.0)
-            .min_width(240.0)
-            .show(ctx, |ui| {
+            .default_size(280.0)
+            .min_size(240.0)
+            .show(ui, |ui| {
                 egui::ScrollArea::vertical().show(ui, |ui| {
                     // In Compare mode, let the user pick which bike's frame
                     // they're editing. In Single mode, slot is forced to A.
@@ -333,11 +333,11 @@ impl eframe::App for App {
             });
 
         // --- Right side panel: cockpit + solver, per bike ---
-        egui::SidePanel::right("cockpit-and-solver")
+        egui::Panel::right("cockpit-and-solver")
             .resizable(true)
-            .default_width(310.0)
-            .min_width(270.0)
-            .show(ctx, |ui| {
+            .default_size(310.0)
+            .min_size(270.0)
+            .show(ui, |ui| {
                 egui::ScrollArea::vertical().show(ui, |ui| {
                     ui.add_space(4.0);
                     show_cockpit_and_solver(
@@ -368,8 +368,8 @@ impl eframe::App for App {
 
         // --- Central panel: bike rendering(s) ---
         egui::CentralPanel::default()
-            .frame(egui::Frame::none())
-            .show(ctx, |ui| {
+            .frame(egui::Frame::new())
+            .show(ui, |ui| {
                 let outer = ui.available_rect_before_wrap();
                 match self.state.mode {
                     AppMode::Single => {
