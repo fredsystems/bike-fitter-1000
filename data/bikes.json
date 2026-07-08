@@ -183,6 +183,363 @@
         "wheel_size": "Iso622",
         "tire_width_mm": 32.0
       }
+    },
+    {
+      "key": "specialized-tarmac-sl9-44-2026",
+      "frame": {
+        "manufacturer": "Specialized",
+        "model": "Tarmac SL9",
+        "size_label": "44",
+        "year": 2026,
+        "stack_mm": 501.0,
+        "reach_mm": 366.0,
+        "head_tube_angle_deg": 70.5,
+        "head_tube_length_mm": 99.0,
+        "seat_tube_angle_deg": 75.5,
+        "seat_tube_length_mm": 433.0,
+        "top_tube_effective_mm": 496.0,
+        "bb_drop_mm": 74.0,
+        "chainstay_mm": 410.0,
+        "fork_rake_mm": 47.0,
+        "front_center_horizontal_mm": 567.0,
+        "wheel_size": "Iso622",
+        "tire_width_mm": 30.0
+      },
+      "default_cockpit": {
+        "Integrated": {
+          "skus": [
+            { "length_mm": 75.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 80.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 85.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 90.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 95.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 100.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 105.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 110.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 115.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 120.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 125.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 130.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 135.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 }
+          ],
+          "spacers": {
+            "spacers": [
+              { "height_mm": 3 },
+              { "height_mm": 5 },
+              { "height_mm": 10 },
+              { "height_mm": 20 }
+            ],
+            "max_stack_mm": 60
+          },
+          "headset_top_cap_mm": 5.0
+        }
+      }
+    },
+    {
+      "key": "specialized-tarmac-sl9-49-2026",
+      "frame": {
+        "manufacturer": "Specialized",
+        "model": "Tarmac SL9",
+        "size_label": "49",
+        "year": 2026,
+        "stack_mm": 514.0,
+        "reach_mm": 375.0,
+        "head_tube_angle_deg": 71.75,
+        "head_tube_length_mm": 109.0,
+        "seat_tube_angle_deg": 75.5,
+        "seat_tube_length_mm": 445.0,
+        "top_tube_effective_mm": 509.0,
+        "bb_drop_mm": 74.0,
+        "chainstay_mm": 410.0,
+        "fork_rake_mm": 47.0,
+        "front_center_horizontal_mm": 570.0,
+        "wheel_size": "Iso622",
+        "tire_width_mm": 30.0
+      },
+      "default_cockpit": {
+        "Integrated": {
+          "skus": [
+            { "length_mm": 75.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 80.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 85.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 90.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 95.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 100.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 105.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 110.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 115.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 120.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 125.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 130.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 135.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 }
+          ],
+          "spacers": {
+            "spacers": [
+              { "height_mm": 3 },
+              { "height_mm": 5 },
+              { "height_mm": 10 },
+              { "height_mm": 20 }
+            ],
+            "max_stack_mm": 60
+          },
+          "headset_top_cap_mm": 5.0
+        }
+      }
+    },
+    {
+      "key": "specialized-tarmac-sl9-52-2026",
+      "frame": {
+        "manufacturer": "Specialized",
+        "model": "Tarmac SL9",
+        "size_label": "52",
+        "year": 2026,
+        "stack_mm": 527.0,
+        "reach_mm": 380.0,
+        "head_tube_angle_deg": 72.5,
+        "head_tube_length_mm": 120.0,
+        "seat_tube_angle_deg": 74.0,
+        "seat_tube_length_mm": 456.0,
+        "top_tube_effective_mm": 531.0,
+        "bb_drop_mm": 74.0,
+        "chainstay_mm": 410.0,
+        "fork_rake_mm": 47.0,
+        "front_center_horizontal_mm": 572.0,
+        "wheel_size": "Iso622",
+        "tire_width_mm": 30.0
+      },
+      "default_cockpit": {
+        "Integrated": {
+          "skus": [
+            { "length_mm": 75.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 80.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 85.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 90.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 95.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 100.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 105.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 110.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 115.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 120.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 125.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 130.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 135.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 }
+          ],
+          "spacers": {
+            "spacers": [
+              { "height_mm": 3 },
+              { "height_mm": 5 },
+              { "height_mm": 10 },
+              { "height_mm": 20 }
+            ],
+            "max_stack_mm": 60
+          },
+          "headset_top_cap_mm": 5.0
+        }
+      }
+    },
+    {
+      "key": "specialized-tarmac-sl9-54-2026",
+      "frame": {
+        "manufacturer": "Specialized",
+        "model": "Tarmac SL9",
+        "size_label": "54",
+        "year": 2026,
+        "stack_mm": 544.0,
+        "reach_mm": 384.0,
+        "head_tube_angle_deg": 72.5,
+        "head_tube_length_mm": 140.0,
+        "seat_tube_angle_deg": 74.0,
+        "seat_tube_length_mm": 473.0,
+        "top_tube_effective_mm": 540.0,
+        "bb_drop_mm": 72.0,
+        "chainstay_mm": 410.0,
+        "fork_rake_mm": 47.0,
+        "front_center_horizontal_mm": 582.0,
+        "wheel_size": "Iso622",
+        "tire_width_mm": 30.0
+      },
+      "default_cockpit": {
+        "Integrated": {
+          "skus": [
+            { "length_mm": 75.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 80.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 85.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 90.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 95.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 100.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 105.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 110.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 115.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 120.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 125.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 130.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 135.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 }
+          ],
+          "spacers": {
+            "spacers": [
+              { "height_mm": 3 },
+              { "height_mm": 5 },
+              { "height_mm": 10 },
+              { "height_mm": 20 }
+            ],
+            "max_stack_mm": 60
+          },
+          "headset_top_cap_mm": 5.0
+        }
+      }
+    },
+    {
+      "key": "specialized-tarmac-sl9-56-2026",
+      "frame": {
+        "manufacturer": "Specialized",
+        "model": "Tarmac SL9",
+        "size_label": "56",
+        "year": 2026,
+        "stack_mm": 565.0,
+        "reach_mm": 395.0,
+        "head_tube_angle_deg": 73.5,
+        "head_tube_length_mm": 157.0,
+        "seat_tube_angle_deg": 73.5,
+        "seat_tube_length_mm": 494.0,
+        "top_tube_effective_mm": 563.0,
+        "bb_drop_mm": 72.0,
+        "chainstay_mm": 410.0,
+        "fork_rake_mm": 44.0,
+        "front_center_horizontal_mm": 587.0,
+        "wheel_size": "Iso622",
+        "tire_width_mm": 30.0
+      },
+      "default_cockpit": {
+        "Integrated": {
+          "skus": [
+            { "length_mm": 75.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 80.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 85.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 90.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 95.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 100.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 105.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 110.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 115.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 120.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 125.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 130.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 135.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 }
+          ],
+          "spacers": {
+            "spacers": [
+              { "height_mm": 3 },
+              { "height_mm": 5 },
+              { "height_mm": 10 },
+              { "height_mm": 20 }
+            ],
+            "max_stack_mm": 60
+          },
+          "headset_top_cap_mm": 5.0
+        }
+      }
+    },
+    {
+      "key": "specialized-tarmac-sl9-58-2026",
+      "frame": {
+        "manufacturer": "Specialized",
+        "model": "Tarmac SL9",
+        "size_label": "58",
+        "year": 2026,
+        "stack_mm": 591.0,
+        "reach_mm": 402.0,
+        "head_tube_angle_deg": 73.5,
+        "head_tube_length_mm": 184.0,
+        "seat_tube_angle_deg": 73.5,
+        "seat_tube_length_mm": 515.0,
+        "top_tube_effective_mm": 577.0,
+        "bb_drop_mm": 72.0,
+        "chainstay_mm": 410.0,
+        "fork_rake_mm": 44.0,
+        "front_center_horizontal_mm": 602.0,
+        "wheel_size": "Iso622",
+        "tire_width_mm": 30.0
+      },
+      "default_cockpit": {
+        "Integrated": {
+          "skus": [
+            { "length_mm": 75.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 80.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 85.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 90.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 95.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 100.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 105.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 110.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 115.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 120.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 125.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 130.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 135.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 }
+          ],
+          "spacers": {
+            "spacers": [
+              { "height_mm": 3 },
+              { "height_mm": 5 },
+              { "height_mm": 10 },
+              { "height_mm": 20 }
+            ],
+            "max_stack_mm": 60
+          },
+          "headset_top_cap_mm": 5.0
+        }
+      }
+    },
+    {
+      "key": "specialized-tarmac-sl9-61-2026",
+      "frame": {
+        "manufacturer": "Specialized",
+        "model": "Tarmac SL9",
+        "size_label": "61",
+        "year": 2026,
+        "stack_mm": 612.0,
+        "reach_mm": 408.0,
+        "head_tube_angle_deg": 74.0,
+        "head_tube_length_mm": 204.0,
+        "seat_tube_angle_deg": 73.0,
+        "seat_tube_length_mm": 545.0,
+        "top_tube_effective_mm": 595.0,
+        "bb_drop_mm": 72.0,
+        "chainstay_mm": 410.0,
+        "fork_rake_mm": 44.0,
+        "front_center_horizontal_mm": 609.0,
+        "wheel_size": "Iso622",
+        "tire_width_mm": 30.0
+      },
+      "default_cockpit": {
+        "Integrated": {
+          "skus": [
+            { "length_mm": 75.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 80.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 85.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 90.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 95.0,  "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 100.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 105.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 110.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 115.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 120.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 125.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 130.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 },
+            { "length_mm": 135.0, "angle_deg": -10.0, "bar_reach_mm": 75.0, "bar_drop_mm": 125.0 }
+          ],
+          "spacers": {
+            "spacers": [
+              { "height_mm": 3 },
+              { "height_mm": 5 },
+              { "height_mm": 10 },
+              { "height_mm": 20 }
+            ],
+            "max_stack_mm": 60
+          },
+          "headset_top_cap_mm": 5.0
+        }
+      }
     }
   ]
 }

@@ -149,6 +149,69 @@ mod tests {
     }
 
     #[test]
+    fn tarmac_sl9_has_all_seven_sizes() {
+        let sizes = ["44", "49", "52", "54", "56", "58", "61"];
+        for size in sizes {
+            let key = format!("specialized-tarmac-sl9-{size}-2026");
+            let p = by_key(&key).unwrap_or_else(|| panic!("missing SL9 preset {key}"));
+            assert_eq!(p.frame.manufacturer, "Specialized");
+            assert_eq!(p.frame.model, "Tarmac SL9");
+            assert_eq!(p.frame.size_label, size);
+            assert_eq!(p.frame.year, Some(2026));
+            assert_eq!(p.frame.wheel_size, WheelSize::Iso622);
+            assert!((p.frame.tire_width_mm - 30.0).abs() < 1e-9);
+        }
+    }
+
+    #[test]
+    fn tarmac_sl9_44_matches_published_numbers() {
+        let p = by_key("specialized-tarmac-sl9-44-2026").expect("SL9 44 present");
+        let f = &p.frame;
+        assert_eq!(f.stack_mm, 501.0);
+        assert_eq!(f.reach_mm, 366.0);
+        assert_eq!(f.head_tube_angle_deg, 70.5);
+        assert_eq!(f.head_tube_length_mm, 99.0);
+        assert_eq!(f.seat_tube_angle_deg, 75.5);
+        assert_eq!(f.seat_tube_length_mm, 433.0);
+        assert_eq!(f.bb_drop_mm, 74.0);
+        assert_eq!(f.fork_rake_mm, 47.0);
+        assert_eq!(f.front_center_horizontal_mm, Some(567.0));
+    }
+
+    #[test]
+    fn tarmac_sl9_61_uses_slacker_seat_tube_angle() {
+        // The largest size drops to a 73.0 deg effective seat tube angle.
+        let p = by_key("specialized-tarmac-sl9-61-2026").expect("SL9 61 present");
+        let f = &p.frame;
+        assert_eq!(f.seat_tube_angle_deg, 73.0);
+        assert_eq!(f.head_tube_angle_deg, 74.0);
+        assert_eq!(f.stack_mm, 612.0);
+        assert_eq!(f.fork_rake_mm, 44.0);
+    }
+
+    #[test]
+    fn tarmac_sl9_ships_with_integrated_cockpit() {
+        // Every SL9 size carries the same integrated cockpit: 75..=135 in
+        // 5 mm steps (13 SKUs).
+        for size in ["44", "49", "52", "54", "56", "58", "61"] {
+            let key = format!("specialized-tarmac-sl9-{size}-2026");
+            let p = by_key(&key).unwrap_or_else(|| panic!("missing {key}"));
+            let cockpit = p
+                .default_cockpit
+                .as_ref()
+                .unwrap_or_else(|| panic!("{key} should have a default integrated cockpit"));
+            match cockpit {
+                bike_fit_core::Cockpit::Integrated { skus, .. } => {
+                    assert_eq!(skus.len(), 13, "{key}");
+                    assert!((skus.first().unwrap().length_mm - 75.0).abs() < 1e-9);
+                    assert!((skus.last().unwrap().length_mm - 135.0).abs() < 1e-9);
+                }
+                other => panic!("expected Integrated cockpit for {key}, got {other:?}"),
+            }
+        }
+    }
+
+    #[test]
     fn tarmac_sl8_ships_with_integrated_cockpit() {
         let p = by_key("specialized-tarmac-sl8-44-2025").expect("Tarmac preset present");
         let cockpit = p
