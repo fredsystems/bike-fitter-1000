@@ -57,7 +57,9 @@ impl Bike {
         Self {
             active_frame_key: p.key,
             frame: p.frame,
-            cockpit: p.default_cockpit.unwrap_or_else(Cockpit::default_traditional),
+            cockpit: p
+                .default_cockpit
+                .unwrap_or_else(Cockpit::default_traditional),
         }
     }
 
