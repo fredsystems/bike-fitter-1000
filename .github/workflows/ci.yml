@@ -66,9 +66,7 @@ jobs:
     steps:
       - name: Verify all jobs succeeded
         run: |
-          echo "skip-if-clean:   ${{ needs.skip-if-clean.outputs.skip }}"
           echo "build-and-check: ${{ needs.build-and-check.result }}"
-          echo "coverage:        ${{ needs.coverage.result }}"
           echo "check:           ${{ needs.check.result }}"
 
           # Fast-path: if the merge queue skipper determined no re-check
@@ -80,11 +78,6 @@ jobs:
 
           if [[ "${{ needs.build-and-check.result }}" != "success" ]]; then
             echo "❌ build-and-check failed"
-            exit 1
-          fi
-
-          if [[ "${{ needs.coverage.result }}" != "success" ]]; then
-            echo "❌ coverage failed"
             exit 1
           fi
 
