@@ -540,6 +540,160 @@
           "headset_top_cap_mm": 5.0
         }
       }
+    },
+    {
+      "key": "canyon-endurace-2xs-2026",
+      "frame": {
+        "manufacturer": "Canyon",
+        "model": "Endurace",
+        "size_label": "2XS",
+        "year": 2026,
+        "stack_mm": 524.0,
+        "reach_mm": 378.0,
+        "head_tube_angle_deg": 70.3,
+        "head_tube_length_mm": 103.0,
+        "seat_tube_angle_deg": 73.5,
+        "seat_tube_length_mm": 432.0,
+        "top_tube_effective_mm": 533.0,
+        "bb_drop_mm": 74.0,
+        "chainstay_mm": 418.0,
+        "fork_rake_mm": 47.0,
+        "front_center_horizontal_mm": null,
+        "wheel_size": "Iso622",
+        "tire_width_mm": 32.0
+      }
+    },
+    {
+      "key": "canyon-endurace-xs-2026",
+      "frame": {
+        "manufacturer": "Canyon",
+        "model": "Endurace",
+        "size_label": "XS",
+        "year": 2026,
+        "stack_mm": 545.0,
+        "reach_mm": 383.0,
+        "head_tube_angle_deg": 71.0,
+        "head_tube_length_mm": 123.0,
+        "seat_tube_angle_deg": 73.5,
+        "seat_tube_length_mm": 462.0,
+        "top_tube_effective_mm": 544.0,
+        "bb_drop_mm": 74.0,
+        "chainstay_mm": 418.0,
+        "fork_rake_mm": 47.0,
+        "front_center_horizontal_mm": null,
+        "wheel_size": "Iso622",
+        "tire_width_mm": 32.0
+      }
+    },
+    {
+      "key": "canyon-endurace-s-2026",
+      "frame": {
+        "manufacturer": "Canyon",
+        "model": "Endurace",
+        "size_label": "S",
+        "year": 2026,
+        "stack_mm": 565.0,
+        "reach_mm": 386.0,
+        "head_tube_angle_deg": 71.8,
+        "head_tube_length_mm": 141.0,
+        "seat_tube_angle_deg": 73.5,
+        "seat_tube_length_mm": 492.0,
+        "top_tube_effective_mm": 553.0,
+        "bb_drop_mm": 74.0,
+        "chainstay_mm": 418.0,
+        "fork_rake_mm": 47.0,
+        "front_center_horizontal_mm": null,
+        "wheel_size": "Iso622",
+        "tire_width_mm": 32.0
+      }
+    },
+    {
+      "key": "canyon-endurace-m-2026",
+      "frame": {
+        "manufacturer": "Canyon",
+        "model": "Endurace",
+        "size_label": "M",
+        "year": 2026,
+        "stack_mm": 586.0,
+        "reach_mm": 388.0,
+        "head_tube_angle_deg": 72.5,
+        "head_tube_length_mm": 161.0,
+        "seat_tube_angle_deg": 73.5,
+        "seat_tube_length_mm": 522.0,
+        "top_tube_effective_mm": 562.0,
+        "bb_drop_mm": 74.0,
+        "chainstay_mm": 418.0,
+        "fork_rake_mm": 47.0,
+        "front_center_horizontal_mm": null,
+        "wheel_size": "Iso622",
+        "tire_width_mm": 32.0
+      }
+    },
+    {
+      "key": "canyon-endurace-l-2026",
+      "frame": {
+        "manufacturer": "Canyon",
+        "model": "Endurace",
+        "size_label": "L",
+        "year": 2026,
+        "stack_mm": 608.0,
+        "reach_mm": 397.0,
+        "head_tube_angle_deg": 72.5,
+        "head_tube_length_mm": 183.0,
+        "seat_tube_angle_deg": 73.5,
+        "seat_tube_length_mm": 552.0,
+        "top_tube_effective_mm": 577.0,
+        "bb_drop_mm": 74.0,
+        "chainstay_mm": 418.0,
+        "fork_rake_mm": 47.0,
+        "front_center_horizontal_mm": null,
+        "wheel_size": "Iso622",
+        "tire_width_mm": 32.0
+      }
+    },
+    {
+      "key": "canyon-endurace-xl-2026",
+      "frame": {
+        "manufacturer": "Canyon",
+        "model": "Endurace",
+        "size_label": "XL",
+        "year": 2026,
+        "stack_mm": 633.0,
+        "reach_mm": 405.0,
+        "head_tube_angle_deg": 72.8,
+        "head_tube_length_mm": 208.0,
+        "seat_tube_angle_deg": 73.5,
+        "seat_tube_length_mm": 582.0,
+        "top_tube_effective_mm": 593.0,
+        "bb_drop_mm": 74.0,
+        "chainstay_mm": 418.0,
+        "fork_rake_mm": 47.0,
+        "front_center_horizontal_mm": null,
+        "wheel_size": "Iso622",
+        "tire_width_mm": 32.0
+      }
+    },
+    {
+      "key": "canyon-endurace-2xl-2026",
+      "frame": {
+        "manufacturer": "Canyon",
+        "model": "Endurace",
+        "size_label": "2XL",
+        "year": 2026,
+        "stack_mm": 652.0,
+        "reach_mm": 415.0,
+        "head_tube_angle_deg": 72.8,
+        "head_tube_length_mm": 229.0,
+        "seat_tube_angle_deg": 73.5,
+        "seat_tube_length_mm": 612.0,
+        "top_tube_effective_mm": 608.0,
+        "bb_drop_mm": 74.0,
+        "chainstay_mm": 418.0,
+        "fork_rake_mm": 47.0,
+        "front_center_horizontal_mm": null,
+        "wheel_size": "Iso622",
+        "tire_width_mm": 32.0
+      }
     }
   ]
 }

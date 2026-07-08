@@ -149,6 +149,52 @@ mod tests {
     }
 
     #[test]
+    fn endurace_2026_has_all_seven_sizes() {
+        let sizes = ["2xs", "xs", "s", "m", "l", "xl", "2xl"];
+        for size in sizes {
+            let key = format!("canyon-endurace-{size}-2026");
+            let p = by_key(&key).unwrap_or_else(|| panic!("missing Endurace preset {key}"));
+            assert_eq!(p.frame.manufacturer, "Canyon");
+            assert_eq!(p.frame.model, "Endurace");
+            assert_eq!(p.frame.year, Some(2026));
+            assert_eq!(p.frame.wheel_size, WheelSize::Iso622);
+            assert!((p.frame.tire_width_mm - 32.0).abs() < 1e-9);
+            assert!((p.frame.bb_drop_mm - 74.0).abs() < 1e-9);
+            assert!((p.frame.chainstay_mm - 418.0).abs() < 1e-9);
+            // No OEM cockpit: falls back to the default traditional catalog
+            // (stems 70..=130 in 10 mm steps).
+            assert!(p.default_cockpit.is_none(), "{key}");
+            // Front-center is intentionally omitted for these entries.
+            assert!(p.frame.front_center_horizontal_mm.is_none(), "{key}");
+        }
+    }
+
+    #[test]
+    fn endurace_2026_2xs_matches_published_numbers() {
+        let p = by_key("canyon-endurace-2xs-2026").expect("Endurace 2XS present");
+        let f = &p.frame;
+        assert_eq!(f.stack_mm, 524.0);
+        assert_eq!(f.reach_mm, 378.0);
+        assert_eq!(f.head_tube_angle_deg, 70.3);
+        assert_eq!(f.head_tube_length_mm, 103.0);
+        assert_eq!(f.seat_tube_angle_deg, 73.5);
+        assert_eq!(f.seat_tube_length_mm, 432.0);
+        assert_eq!(f.top_tube_effective_mm, 533.0);
+    }
+
+    #[test]
+    fn endurace_2026_2xl_matches_published_numbers() {
+        let p = by_key("canyon-endurace-2xl-2026").expect("Endurace 2XL present");
+        let f = &p.frame;
+        assert_eq!(f.stack_mm, 652.0);
+        assert_eq!(f.reach_mm, 415.0);
+        assert_eq!(f.head_tube_angle_deg, 72.8);
+        assert_eq!(f.head_tube_length_mm, 229.0);
+        assert_eq!(f.seat_tube_length_mm, 612.0);
+        assert_eq!(f.top_tube_effective_mm, 608.0);
+    }
+
+    #[test]
     fn tarmac_sl9_has_all_seven_sizes() {
         let sizes = ["44", "49", "52", "54", "56", "58", "61"];
         for size in sizes {
