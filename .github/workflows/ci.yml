@@ -54,7 +54,7 @@ jobs:
         with:
           toolchain: ${{ matrix.toolchain }}
       - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
-      - run: cargo xtask check
+      - run: cargo test
 
   ci-success:
     name: CI Success
