@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  pull_request:
+  merge_group:
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+    needs: skip-if-clean
+    if: ${{ needs.skip-if-clean.outputs.skip != 'true' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: 0
+
+      # --- Install Nix via Determinate Systems ---
+      - name: Set up Determinate Nix
+        uses: DeterminateSystems/determinate-nix-action@629b284231c2a82554b724e357e47fc6020833c8 # v3
+
+      - name: Use Determinate Cache
+        uses: DeterminateSystems/magic-nix-cache-action@908b263ff629f4cc17666315b7fd3ec127c6244d # v14
+        with:
+          use-flakehub: false
+          use-gha-cache: false
+
+      # --- Enter your flake's devShell (same behavior as direnv) ---
+      - name: Run checks in devShell
+        run: |
+          nix develop --impure --command bash -e -c '
+            set -euxo pipefail
+            pre-commit run --all-files
+          '
+
+  # Run cargo check. This is a fast way to catch any obvious errors in the code.
+  check:
+    name: Check ${{ matrix.os }} ${{ matrix.toolchain }}
+    needs: skip-if-clean
+    if: ${{ needs.skip-if-clean.outputs.skip != 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest, ubuntu-24.04-arm]
+        toolchain: ["stable", "nightly", "1.95.0"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: dtolnay/rust-toolchain@67ef31d5b988238dd797d409d6f9574278e20537 # master
+        with:
+          toolchain: ${{ matrix.toolchain }}
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
+      - run: cargo xtask check
+
+  ci-success:
+    name: CI Success
+    runs-on: ubuntu-latest
+    needs:
+      - build-and-check
+      - check
+    if: always()
+    steps:
+      - name: Verify all jobs succeeded
+        run: |
+          echo "skip-if-clean:   ${{ needs.skip-if-clean.outputs.skip }}"
+          echo "build-and-check: ${{ needs.build-and-check.result }}"
+          echo "coverage:        ${{ needs.coverage.result }}"
+          echo "check:           ${{ needs.check.result }}"
+
+          # Fast-path: if the merge queue skipper determined no re-check
+          # is needed, all downstream jobs were skipped — that is success.
+          if [[ "${{ needs.skip-if-clean.outputs.skip }}" == "true" ]]; then
+            echo "✅ Merge queue fast-path: checks skipped (already validated on PR)"
+            exit 0
+          fi
+
+          if [[ "${{ needs.build-and-check.result }}" != "success" ]]; then
+            echo "❌ build-and-check failed"
+            exit 1
+          fi
+
+          if [[ "${{ needs.coverage.result }}" != "success" ]]; then
+            echo "❌ coverage failed"
+            exit 1
+          fi
+
+          if [[ "${{ needs.check.result }}" != "success" ]]; then
+            echo "❌ check matrix failed"
+            exit 1
+          fi
+
+          echo "✅ All CI jobs succeeded"
