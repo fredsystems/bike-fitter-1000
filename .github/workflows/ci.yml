@@ -33,6 +33,10 @@ jobs:
 
       # --- Enter your flake's devShell (same behavior as direnv) ---
       - name: Run checks in devShell
+        env:
+          # Lets the lychee link check use the GitHub API for github.com links
+          # instead of being rate limited.
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           nix develop --impure --command bash -e -c '
             set -euxo pipefail
@@ -68,13 +72,6 @@ jobs:
         run: |
           echo "build-and-check: ${{ needs.build-and-check.result }}"
           echo "check:           ${{ needs.check.result }}"
-
-          # Fast-path: if the merge queue skipper determined no re-check
-          # is needed, all downstream jobs were skipped — that is success.
-          if [[ "${{ needs.skip-if-clean.outputs.skip }}" == "true" ]]; then
-            echo "✅ Merge queue fast-path: checks skipped (already validated on PR)"
-            exit 0
-          fi
 
           if [[ "${{ needs.build-and-check.result }}" != "success" ]]; then
             echo "❌ build-and-check failed"
